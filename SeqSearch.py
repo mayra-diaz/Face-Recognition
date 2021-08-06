@@ -29,7 +29,7 @@ def init_search(Q, source):
         index_ = index.Index('face_recognition_index_' + source, properties=property)
         return index_, list_of_values, dict
     else:
-        return None
+        return None, None, None
 
 def validate_range(neighbor_vector, range_vector):
     i = 0
