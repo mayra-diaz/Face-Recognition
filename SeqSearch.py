@@ -32,41 +32,48 @@ def init_search(Q, source):
         return None
 
 def validate_range(neighbor_vector, range_vector):
-    for i in range(len(neighbor_vector) // 2):
+    i = 0
+    j = len(neighbor_vector) // 2
+    while i < j:
         if not range_vector[i] <= neighbor_vector[i] <= range_vector[len(neighbor_vector) // 2 + i]:
             return False
+        i+=1
     return True
 
-def generate_range_vector(feature_vector, r):
-    range_vector = [0] * len(feature_vector)
-    for i in range(len(feature_vector) // 2):
-        range_vector[i] = feature_vector[i] - r
-        range_vector[i + len(feature_vector) // 2] = feature_vector[i] + r
+
+def create_range_vector(vector, r):
+    range_vector = [0] * len(vector)
+    i = 0
+    j = len(vector) // 2
+    while i < j:
+        range_vector[i] = vector[i] - r
+        range_vector[i + len(vector) // 2] = vector[i] + r
+        i+=1
     return range_vector
 
-def KNN_sequential(Q, k, path):
-    idx, feature_vector, names_dict = init_search(Q, path)
-    if idx == None:
+def KNN(Q, k, path):
+    index_, vector, dict = init_search(Q, path)
+    if index_ == None:
         return []
-    images = idx.intersection(idx.bounds, objects=True) # puntero al indice
+    pictures = index_.intersection(index.bounds, objects=True)
     neighbors = []
-    for image in images: # recorrer bloque a bloque
-        d = euclidean_distance(feature_vector, image.bbox)
-        heapq.heappush(neighbors, (-d, image.id))
-        if len(neighbors) > k:
+    for picture in pictures: 
+        d = euclidean_distance(vector, picture.bbox)
+        heapq.heappush(neighbors, (d * -1, picture.id))
+        if k < len(neighbors):
             heapq.heappop(neighbors)
     neighbors = [(i, d * -1) for d, i in neighbors]
     neighbors.sort(key=lambda tup: tup[1])
-    return [names_dict[str(i)] for i, d in neighbors]
+    return [dict[str(i)] for i in neighbors]
         
-def range_search_sequential(Q, r, path):
-    idx, feature_vector, names_dict = init_search(Q, path)
-    if idx == None:
+def range_search(Q, r, path):
+    index_, vector, dict = init_search(Q, path)
+    if index_ == None:
         return []
-    images = idx.intersection(idx.bounds, objects=True) # puntero al indice
+    pictures = index_.intersection(index.bounds, objects=True)
     neighbors = []
-    range_vector = generate_range_vector(feature_vector, r)
-    for image in images: # recorrer bloque a bloque
-        if validate_range(image.bbox, range_vector):
-            neighbors.append(image.id)
-    return [names_dict[str(i)] for i in neighbors]
+    range_vector = create_range_vector(vector, r)
+    for picture in pictures:
+        if validate_range(picture.bbox, range_vector):
+            neighbors.append(picture.id)
+    return [dict[str(i)] for i in neighbors]
