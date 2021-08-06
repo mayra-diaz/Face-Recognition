@@ -1,4 +1,3 @@
-
 def get_point(vector):
     doble = vector + vector
     return tuple(i and i for i in doble)

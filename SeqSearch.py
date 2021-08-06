@@ -7,32 +7,33 @@ from rtree import index
 from util import *
 
 
-def init_search(Q, path):
-    total_path = 'data/' + path + '/'
-    total_files = int(path)
+def init_search(Q, source):
+    complete_path = 'data/' + source + '/'
+    number_of_files = get_number_of_files(source)
 
-    with open("diccionario_" + path + ".json") as json_file:
+    with open("dict_" + source + ".json") as json_file:
         dict = json.load(json_file)
 
-    picture_1 = face_recognition.load_image_file(total_path + Q)
-    face_encoding_1 = face_recognition.face_encodings(picture_1)
-    if face_encoding_1:
-        values = face_encoding_1[0].tolist()
-        values = (get_point(values))
-        p = index.Property()
-        p.dimension = 128  # D
-        p.buffering_capacity = int(math.log(total_files, 10) ** 2) + 3 # M
-        p.dat_extension = 'data'
-        p.idx_extension = 'index'
-        p.overwrite = False
-        idx = index.Index('face_recognition_index_' + path, properties=p)
-        return idx, values, dict
+    first_picture = face_recognition.load_image_file(complete_path + Q)
+    first_face_encoding = face_recognition.face_encodings(first_picture)
+
+    if first_face_encoding:
+        list_of_values = first_face_encoding[0].tolist()
+        list_of_values = (get_point(list_of_values))
+        property = index.Property()
+        property.dimension = 128
+        property.buffering_capacity = 3 + int(math.log(number_of_files, 10) ** 2)
+        property.dat_extension = 'data'
+        property.idx_extension = 'index'
+        property.overwrite = False
+        index_ = index.Index('face_recognition_index_' + source, properties=property)
+        return index_, list_of_values, dict
     else:
         return None
 
-def is_inside_range(neighbor_feature_vector, range_vector):
-    for i in range(len(neighbor_feature_vector) // 2):
-        if not range_vector[i] <= neighbor_feature_vector[i] <= range_vector[i + len(neighbor_feature_vector) // 2]:
+def validate_range(neighbor_vector, range_vector):
+    for i in range(len(neighbor_vector) // 2):
+        if not range_vector[i] <= neighbor_vector[i] <= range_vector[len(neighbor_vector) // 2 + i]:
             return False
     return True
 
@@ -66,6 +67,6 @@ def range_search_sequential(Q, r, path):
     neighbors = []
     range_vector = generate_range_vector(feature_vector, r)
     for image in images: # recorrer bloque a bloque
-        if is_inside_range(image.bbox, range_vector):
+        if validate_range(image.bbox, range_vector):
             neighbors.append(image.id)
     return [names_dict[str(i)] for i in neighbors]
