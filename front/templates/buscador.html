@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='grid.css')}}">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class=flashes id="flash">
+    {% for category, message in messages %}
+      <div class="alert {{ category }}" role="alert">{{ message }}</div>
+    {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main class="flex-shrink-0">
+    <div id="loading" class="loader">Loading...</div>
+    <div class="container">
+        <h1 class="mt-5">Reconocimiento Facial</h1>
+        <p class="lead">Subir a continuación una imágen a la que desea encontrar simulitudes en nuestra base de datos:</p>
+        <form name="myForm" action="{{ url_for('search') }}" method="post" enctype="multipart/form-data">
+            <div>
+                <input type="file" class="form-control-file mb-4 mt-2" id="file" accept="image/x-png,image/jpeg" name="file">
+            </div>
+ 
+            <input type="radio" id="kn" name="type" value="knn">
+            <label for="kn">Vecinos más cercanos</label><br>
+            <input type="radio" id="rango" name="type" value="rango">
+            <label for="rango">por Rango</label><br>
+            <div id="x" class="form-text mb-3">Seleccione el tipo de búsqueda.</div>
+
+
+            <input class="form-control" style="display: none" type="number" min="4" value="16" name="numElement" id="numElement">
+            <div id="numElementLabel" style="display: none" class="form-text">Seleccione el número de respuestas.</div>
+
+            <input class="form-control" style="display: none" step=".01" min="0" max="1" value="0.15" type="number" name="numRange" id="numRange">
+            <div  id="numRangeLabel" style="display: none" class="form-text">Seleccione el número de rango.</div>
+
+
+            <button  class="btn btn-primary mt-3" onclick="loading();">Buscar</button>
+            </div>
+        </form>
+    </div>
+    {% if images_output %}
+    <div class="container mt-4">
+        <section id="pics">
+        {% for image in images_output %}
+            <div><img src="{{image}}" width="240"></div>
+        {% endfor %}
+        </section>
+    </div>    
+    {% endif %}
+
+    </div>
+</main>
+
+<script type="text/javascript" src="{{ url_for('static', filename='search.js') }}"></script>
+
+{% endblock %}

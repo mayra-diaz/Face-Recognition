@@ -5,28 +5,28 @@ from math import log10
 
 from util import *
 
-def init_search(Q, path,frontEnd):
+def init_search(Q, path,frontEnd, out='DB/'):
     if frontEnd==False:
-        total_path = 'data/' + path + '/'
+        total_path = 'source/' + path + '/'
     else:
-        total_path = 'data/imageInput/'
-    total_files = int(path)
+        total_path = 'input/'
+    total_files = get_number_of_files(path)
 
-    with open("diccionario_" + path + ".json") as json_file:
+    with open(out + "diccionario_" + path + ".json") as json_file:
         dict = json.load(json_file)
 
     picture_1 = face_recognition.load_image_file(total_path + Q)
     face_encoding_1 = face_recognition.face_encodings(picture_1)
     if face_encoding_1:
         values = face_encoding_1[0].tolist()
-        values = (generate_point(values))
+        values = (get_point(values))
         p = index.Property()
         p.dimension = 128  # D
         p.buffering_capacity = int(log10(total_files) ** 2) + 3 # M
         p.dat_extension = 'data'
         p.idx_extension = 'index'
         p.overwrite = False
-        idx = index.Index('face_recognition_index_' + path, properties=p)
+        idx = index.Index(out+'index' + path, properties=p)
         return idx, values, dict
     else:
         return None,None,None
