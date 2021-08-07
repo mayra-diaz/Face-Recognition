@@ -3,7 +3,9 @@
 *::after {
   box-sizing: border-box;
 }
-
+main{
+  text-align: center;
+}
 #pics {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -48,6 +50,7 @@
   width: 1em;
   height: 4em;
 }
+
 .loader {
   color: #000000;
   text-indent: -9999em;
@@ -97,4 +100,17 @@
     box-shadow: 0 -2em;
     height: 5em;
   }
+}
+
+.form-control{
+  background-color: black !important;
+}
+
+
+.form-control-file mb-4 mt-2{
+  background-color: #000000;
+}
+
+.file{
+  background-color: #000000;
 }
